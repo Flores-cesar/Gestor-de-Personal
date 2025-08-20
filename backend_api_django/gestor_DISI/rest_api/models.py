@@ -2,14 +2,14 @@ from django.db import models
 
 class Departamento(models.Model):
     id_departamento = models.AutoField(primary_key=True)
-    id_responsable = models.ForeignKey(
+    responsable = models.ForeignKey(
         "Empleado",  # entre comillas porque se referencia más abajo
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         db_column="id_responsable"
     )
-    nombre = models.CharField(max_length=20)
+    nombre = models.CharField(max_length=50)
     descripcion = models.TextField(null=True, blank=True)
 
     class Meta:
@@ -21,7 +21,7 @@ class Departamento(models.Model):
 
 class Rol(models.Model):
     id_rol = models.AutoField(primary_key=True)
-    id_departamento = models.ForeignKey(
+    departamento = models.ForeignKey(
         Departamento,
         on_delete=models.CASCADE,
         db_column="id_departamento"
@@ -48,7 +48,7 @@ class Empleado(models.Model):
     nombre = models.CharField(max_length=50)
     apellido = models.CharField(max_length=50)
     edad = models.IntegerField(default=18)
-    id_rol = models.ForeignKey(
+    rol = models.ForeignKey(
         Rol,
         on_delete=models.RESTRICT,
         db_column="id_rol"

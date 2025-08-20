@@ -33,7 +33,7 @@ def empleado_detail(request, id_empleado):
         "nombre": e.nombre,
         "apellido": e.apellido,
         "edad": e.edad,
-        "id_rol": e.id_rol.id_rol,
+        "rol": e.rol.id_rol,
         "fecha_ingreso": e.fecha_ingreso,
         "salario": e.salario,
         "estado": e.estado,
@@ -47,13 +47,13 @@ def empleado_create(request):
     if data is None:
         return JsonResponse({"message": "JSON inválido"}, status=400)
 
-    required = ["nombre", "apellido", "id_rol", "fecha_ingreso", "salario","edad"]
+    required = ["nombre", "apellido", "rol(id)", "fecha_ingreso", "salario","edad"]
     missing = [k for k in required if k not in data]
     if missing:
         return JsonResponse({"message": f"Faltan campos: {', '.join(missing)}"}, status=400)
 
     try:
-        rol = Rol.objects.get(id_rol=data["id_rol"])
+        rol = Rol.objects.get(id_rol=data["rol"])
     except Rol.DoesNotExist:
         return JsonResponse({"message": "El rol especificado no existe"}, status=400)
 
@@ -61,7 +61,7 @@ def empleado_create(request):
         nombre=data["nombre"],
         apellido=data["apellido"],
         edad=data.get("edad", 18),
-        id_rol=rol,
+        rol=rol,
         fecha_ingreso=data["fecha_ingreso"],  # formato ISO: YYYY-MM-DD
         salario=data["salario"],
         estado=data.get("estado", "activo"),
@@ -86,9 +86,9 @@ def empleado_update(request, id_empleado):
     e.edad = data.get("edad", e.edad)
     e.salario = data.get("salario", e.salario)
 
-    if "id_rol" in data:
+    if "rol" in data:
         try:
-            e.id_rol = Rol.objects.get(id_rol=data["id_rol"])
+            e.rol = Rol.objects.get(id_rol=data["rol"])
         except Rol.DoesNotExist:
             return JsonResponse({"message": "El rol especificado no existe"}, status=400)
 
@@ -130,7 +130,7 @@ def departamento_detail(request, id_departamento):
 
     data = {
         "id_departamento": d.id_departamento,
-        "id_responsable": d.id_responsable.id_empleado if d.id_responsable else None,
+        "responsable": d.responsable.id_empleado if d.responsable else None,
         "nombre": d.nombre,
         "descripcion": d.descripcion,
     }
@@ -144,14 +144,14 @@ def departamento_create(request):
         return JsonResponse({"message": "JSON inválido"}, status=400)
 
     responsable = None
-    if data.get("id_responsable"):
+    if data.get("responsable"):
         try:
-            responsable = Empleado.objects.get(id_empleado=data["id_responsable"])
+            responsable_id = Empleado.objects.get(id_empleado=data["responsable"])
         except Empleado.DoesNotExist:
             return JsonResponse({"message": "Responsable no encontrado"}, status=400)
 
     d = Departamento.objects.create(
-        id_responsable=responsable,
+        responsable=responsable_id,
         nombre=data.get("nombre", ""),
         descripcion=data.get("descripcion", "")
     )
@@ -172,12 +172,12 @@ def departamento_update(request, id_departamento):
     d.nombre = data.get("nombre", d.nombre)
     d.descripcion = data.get("descripcion", d.descripcion)
 
-    if "id_responsable" in data:
-        if data["id_responsable"] is None:
-            d.id_responsable = None
+    if "responsable" in data:
+        if data["responsable"] is None:
+            d.responsable = None
         else:
             try:
-                d.id_responsable = Empleado.objects.get(id_empleado=data["id_responsable"])
+                d.responsable = Empleado.objects.get(id_empleado=data["responsable"])
             except Empleado.DoesNotExist:
                 return JsonResponse({"message": "Responsable no encontrado"}, status=400)
 
@@ -214,7 +214,7 @@ def rol_detail(request, id_rol):
 
     data = {
         "id_rol": r.id_rol,
-        "id_departamento": r.id_departamento.id_departamento,
+        "departamento": r.departamento.id_departamento,
         "nombre": r.nombre,
         "responsabilidades": r.responsabilidades,
     }
@@ -228,12 +228,12 @@ def rol_create(request):
         return JsonResponse({"message": "JSON inválido"}, status=400)
 
     try:
-        depto = Departamento.objects.get(id_departamento=data["id_departamento"])
+        depto_id = Departamento.objects.get(id_departamento=data["departamento"])
     except Departamento.DoesNotExist:
         return JsonResponse({"message": "Departamento no encontrado"}, status=400)
 
     r = Rol.objects.create(
-        id_departamento=depto,
+        departamento=depto_id,
         nombre=data.get("nombre", ""),
         responsabilidades=data.get("responsabilidades", "")
     )
@@ -254,9 +254,9 @@ def rol_update(request, id_rol):
     r.nombre = data.get("nombre", r.nombre)
     r.responsabilidades = data.get("responsabilidades", r.responsabilidades)
 
-    if "id_departamento" in data:
+    if "departamento" in data:
         try:
-            r.id_departamento = Departamento.objects.get(id_departamento=data["id_departamento"])
+            r.departamento = Departamento.objects.get(id_departamento=data["departamento"])
         except Departamento.DoesNotExist:
             return JsonResponse({"message": "Departamento no encontrado"}, status=400)
 
