@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react"
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { getEmpleados, createEmpleado, updateEmpleado, deleteEmpleado } from "./helpers/empleado/empleadosService";
+import { getEmpleados, createEmpleado, updateEmpleado, deleteEmpleado } from "../helpers/empleado/empleadosService";
 
-function App() {
+export default function Empleados() {
 
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
@@ -204,4 +204,3 @@ function App() {
   )
 }
 
-export default App
