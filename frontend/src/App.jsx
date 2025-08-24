@@ -1,7 +1,6 @@
-import './App.css'
 import { useState, useEffect } from "react"
-import Axios from "axios"
 import 'bootstrap/dist/css/bootstrap.min.css'
+import { getEmpleados, createEmpleado, updateEmpleado, deleteEmpleado } from "./helpers/empleado/empleadosService";
 
 function App() {
 
@@ -17,55 +16,72 @@ function App() {
   const [idEmpleado, setIdEmpleado] = useState(null);
 
   // Obtener empleados al inicio
-  useEffect(() => {
-    getEmpleados();
-  }, []);
-
-  const getEmpleados = () => {
-    Axios.get("http://127.0.0.1:8000/api/empleados/list").then((response) => {
+  const ObtenerEmpleados = async () => {
+    try {
+      const response = await getEmpleados();
       setEmpleados(response.data.empleados);
-    });
+    } catch (error) {
+      console.error("Error al obtener los empleados", error);
+    }
   };
 
-  const addEmpleado = () => {
-    Axios.post("http://127.0.0.1:8000/api/empleados/create/", {
-      nombre,
-      apellido,
-      edad,
-      rol,
-      fecha_ingreso: fechaIngreso,
-      salario,
-      estado,
-    }).then(() => {
+  useEffect(() => {
+    ObtenerEmpleados();
+  }, []);
+  
+  const crearEmpleado = async () => {
+    try {
+      const nuevoEmpleado = {
+        nombre,
+        apellido,
+        edad,
+        rol,
+        fecha_ingreso: fechaIngreso,
+        salario,
+        estado,
+      };
+      console.log("Datos enviados:", nuevoEmpleado); // Para depuración
+      const response = await createEmpleado(nuevoEmpleado);
       alert("Empleado registrado");
-      getEmpleados();
+      await ObtenerEmpleados(); // Asegura que la lista se actualice después de crear
       limpiarFormulario();
-    });
+    } catch (error) {
+      console.error("Respuesta del servidor:", error.message);
+      alert(error.message);
+    }
   };
 
-  const updateEmpleado = () => {
-    Axios.put(`http://127.0.0.1:8000/api/empleados/${idEmpleado}/update/`, {
-      nombre,
-      apellido,
-      edad,
-      rol,
-      fecha_ingreso: fechaIngreso,
-      salario,
-      estado,
-    }).then(() => {
-      alert("Empleado actualizado");
-      getEmpleados();
-      setEditar(false);
-      limpiarFormulario();
-    });
-  };
+  const actualizarEmpleado = async () => {
+      try {
+        const empleadoActualizado = {
+          nombre,
+          apellido,
+          edad,
+          rol,
+          fecha_ingreso: fechaIngreso,
+          salario,
+          estado,
+        };
+        console.log("Datos enviados para actualizar:", empleadoActualizado);
+        await updateEmpleado(idEmpleado, empleadoActualizado);
+        alert("Empleado actualizado");
+        await ObtenerEmpleados();
+        setEditar(false);
+        limpiarFormulario();
+      } catch (error) {
+        console.error("Error al obtener los empleados", error);
+      }
+    };
 
-  const deleteEmpleado = (id) => {
-    Axios.delete(`http://127.0.0.1:8000/api/empleados/${id}/delete/`).then(() => {
-      alert("Empleado eliminado");
-      getEmpleados();
-    });
-  };
+  const eliminarEmpleado = async (id) => {
+      try {
+        await deleteEmpleado(id);
+        alert("Empleado eliminado");
+        await ObtenerEmpleados();
+      } catch (error) {
+        console.error("Error al obtener los empleados", error);
+      }
+    };
 
   const editarEmpleado = (val) => {
     setEditar(true);
@@ -140,11 +156,11 @@ function App() {
         <div className="card-footer text-muted">
           {editar ? (
             <div>
-              <button className="btn btn-warning m-2" onClick={updateEmpleado}>Actualizar</button>
+              <button className="btn btn-warning m-2" onClick={actualizarEmpleado}>Actualizar</button>
               <button className="btn btn-info m-2" onClick={limpiarFormulario}>Cancelar</button>
             </div>
           ) : (
-            <button className="btn btn-success" onClick={addEmpleado}>Crear Empleado</button>
+            <button className="btn btn-success" onClick={crearEmpleado}>Crear Empleado</button>
           )}
         </div>
       </div>
@@ -177,7 +193,7 @@ function App() {
               <td>
                 <div className="btn-group">
                   <button className="btn btn-primary" onClick={() => editarEmpleado(val)}>Editar</button>
-                  <button className="btn btn-danger" onClick={() => deleteEmpleado(val.id_empleado)}>Eliminar</button>
+                  <button className="btn btn-danger" onClick={() => eliminarEmpleado(val.id_empleado)}>Eliminar</button>
                 </div>
               </td>
             </tr>
