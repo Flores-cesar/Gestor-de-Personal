@@ -47,7 +47,7 @@ def empleado_create(request):
     if data is None:
         return JsonResponse({"message": "JSON inválido"}, status=400)
 
-    required = ["nombre", "apellido", "rol(id)", "fecha_ingreso", "salario","edad"]
+    required = ["nombre", "apellido", "rol", "fecha_ingreso", "salario","edad"]
     missing = [k for k in required if k not in data]
     if missing:
         return JsonResponse({"message": f"Faltan campos: {', '.join(missing)}"}, status=400)
