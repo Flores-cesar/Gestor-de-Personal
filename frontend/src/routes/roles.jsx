@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { getRoles, createRol, updateRol, deleteRol } from "../helpers/rol/rolesService";
-
+import { getDepartamentos } from "../helpers/departamento/departamentosService";
 export default function Roles() {
 
   const [nombre, setNombre] = useState("");
@@ -31,18 +31,9 @@ export default function Roles() {
 
   const ObtenerDepartamentos = async () => {
     try {
-      // aca despues llamo al servicio de departamentos
-      // const response = await getDepartamentos();
-      // setDepartamentos(response.data.departamentos);
-      
-      // Por ahora datos de ejemplo:
-      setDepartamentos([
-        { id_departamento: 1, nombre: "Sistemas" },
-        { id_departamento: 2, nombre: "Recursos Humanos" },
-        { id_departamento: 3, nombre: "Ventas" },
-        { id_departamento: 4, nombre: "Marketing" },
-        { id_departamento: 5, nombre: "Finanzas" }
-      ]);
+      const response = await getDepartamentos();
+      setDepartamentos(response.data.departamentos);
+
     } catch (error) {
       console.error("Error al obtener los departamentos", error);
     }
