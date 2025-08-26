@@ -5,6 +5,7 @@ import Root from './routes/root.jsx';
 import Description from './routes/home.jsx';
 import Empleados from './routes/empleados.jsx';
 import Roles from './routes/roles.jsx';
+import Departamentos from './routes/departamentos.jsx';
 
 const router = createBrowserRouter([
   { path: "/", element:<Root/>, 
@@ -23,7 +24,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/departamentos",
-        element: <Description/>
+        element: <Departamentos/>
       },
 
       {
