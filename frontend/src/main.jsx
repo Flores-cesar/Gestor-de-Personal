@@ -4,6 +4,7 @@ import {createBrowserRouter, RouterProvider} from 'react-router-dom'
 import Root from './routes/root.jsx';
 import Description from './routes/home.jsx';
 import Empleados from './routes/empleados.jsx';
+import Roles from './routes/roles.jsx';
 
 const router = createBrowserRouter([
   { path: "/", element:<Root/>, 
@@ -27,7 +28,7 @@ const router = createBrowserRouter([
 
       {
         path:"/roles",
-        element: <Description/>
+        element: <Roles/>
 
       }
     ]
