@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { getEmpleados, createEmpleado, updateEmpleado, deleteEmpleado } from "../helpers/empleado/empleadosService";
+import { getRoles } from "../helpers/rol/rolesService";
 
 export default function Empleados() {
 
@@ -8,6 +9,7 @@ export default function Empleados() {
   const [apellido, setApellido] = useState("");
   const [edad, setEdad] = useState("");
   const [rol, setRol] = useState(""); 
+  const [roles, setRoles] = useState([]);
   const [fechaIngreso, setFechaIngreso] = useState("");
   const [salario, setSalario] = useState("");
   const [estado, setEstado] = useState("activo");
@@ -22,7 +24,6 @@ export default function Empleados() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
 
-  // Datos de ejemplo para demostración
   // Obtener empleados al inicio
   const ObtenerEmpleados = async () => {
     try {
@@ -33,9 +34,26 @@ export default function Empleados() {
     }
   };
 
+  // Obtener roles al inicio
+  const ObtenerRoles = async () => {
+    try {
+      const response = await getRoles();
+      setRoles(response.data.roles);
+    } catch (error) {
+      console.error("Error al obtener los roles", error);
+    }
+  };
+
   useEffect(() => {
     ObtenerEmpleados();
+    ObtenerRoles();
   }, []);
+
+  // Función para obtener el nombre del rol
+  const getNombreRol = (rolId) => {
+    const r = roles.find(d => d.id_rol === rolId);
+    return r ? r.nombre : 'No asignado';
+  };
 
   // Función de ordenamiento
   const handleSort = (key) => {
@@ -50,10 +68,10 @@ export default function Empleados() {
   const getFilteredAndSortedEmpleados = () => {
     let filteredEmpleados = empleados.filter(empleado => {
       const matchesSearch = 
-      
+
         (empleado.nombre?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
         (empleado.apellido?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-        (empleado.rol?.toLowerCase() || "").includes(searchTerm.toLowerCase());
+        (getNombreRol(empleado.rol_id)?.toLowerCase() || "").includes(searchTerm.toLowerCase()); // ✅ buscar por nombre de rol
 
       const matchesEstado = filterEstado === "todos" || empleado.estado === filterEstado;
       
@@ -109,7 +127,7 @@ export default function Empleados() {
       console.log("Datos enviados:", nuevoEmpleado); // Para depuración
       await createEmpleado(nuevoEmpleado);
       alert("Empleado registrado");
-      await ObtenerEmpleados(); // Asegura que la lista se actualice después de crear
+      await ObtenerEmpleados(); 
       limpiarFormulario();
     } catch (error) {
       console.error("Respuesta del servidor:", error.message);
@@ -119,23 +137,23 @@ export default function Empleados() {
 
   const actualizarEmpleado = async () => {
     try {
-        const empleadoActualizado = {
-          nombre,
-          apellido,
-          edad,
-          rol,
-          fecha_ingreso: fechaIngreso,
-          salario,
-          estado,
-        };
-        console.log("Datos enviados para actualizar:", empleadoActualizado);
-        await updateEmpleado(idEmpleado, empleadoActualizado);
+      const empleadoActualizado = {
+        nombre,
+        apellido,
+        edad,
+        rol,
+        fecha_ingreso: fechaIngreso,
+        salario,
+        estado,
+      };
+      console.log("Datos enviados para actualizar:", empleadoActualizado);
+      await updateEmpleado(idEmpleado, empleadoActualizado);
       alert("Empleado actualizado");
-        await ObtenerEmpleados();
+      await ObtenerEmpleados();
       setEditar(false);
       limpiarFormulario();
     } catch (error) {
-        console.error("Error al obtener los empleados", error);
+      console.error("Error al obtener los empleados", error);
     }
   };
 
@@ -223,7 +241,7 @@ export default function Empleados() {
                     />
                   </div>
 
-                  <div className="col-12 mb-3">
+                <div className="col-12 mb-3">
                     <label className="form-label fw-bold">Apellido</label>
                     <input 
                       type="text" 
@@ -259,30 +277,37 @@ export default function Empleados() {
                       <option value="baja">❌ Baja</option>
                     </select>
                   </div>
-
+                 
                   <div className="col-12 mb-3">
-                    <label className="form-label fw-bold">💼 Rol</label>
-                    <input 
-                      type="text" 
+                    <label className="form-label fw-bold">Rol</label>
+
+                    <select 
                       value={rol} 
-                      onChange={(e) => setRol(e.target.value)} 
-                      className="form-control"
-                      placeholder="ej: Desarrollador, Diseñador"
-                    />
-                  </div>
+                      className="form-select" 
+                      onChange={(e) => setRol(Number(e.target.value))}
+                      requiered
+                    >
+                      <option value="">Seleccione un rol</option>
+                      {roles.map((r) => (
+                        <option key={r.id_rol} value={r.id_rol}>
+                          {r.nombre}
+                        </option>
+                      ))}
+                    </select>
+                    </div>
 
-                  <div className="col-12 mb-3">
-                    <label className="form-label fw-bold">📅 Fecha de Ingreso</label>
-                    <input 
-                      type="date" 
-                      value={fechaIngreso} 
-                      onChange={(e) => setFechaIngreso(e.target.value)} 
-                      className="form-control"
-                    />
-                  </div>
+                    <div className="col-12 mb-3">
+                      <label className="form-label fw-bold">📅 Fecha de Ingreso</label>
+                      <input 
+                        type="date" 
+                        value={fechaIngreso} 
+                        onChange={(e) => setFechaIngreso(e.target.value)} 
+                        className="form-control"
+                      />
+                    </div>
 
-                  <div className="col-12 mb-3">
-                    <label className="form-label fw-bold">💰 Salario</label>
+                    <div className="col-12 mb-3">
+                    <label className="form-label fw-bold">Salario</label>
                     <div className="input-group">
                       <span className="input-group-text">$</span>
                       <input 
@@ -303,7 +328,7 @@ export default function Empleados() {
               {editar ? (
                 <div className="d-grid gap-2">
                   <button className="btn btn-warning" onClick={actualizarEmpleado}>
-                    ✏️ Actualizar Empleado
+                    Actualizar Empleado
                   </button>
                   <button className="btn btn-outline-secondary" onClick={limpiarFormulario}>
                     ❌ Cancelar
@@ -393,13 +418,13 @@ export default function Empleados() {
                         style={{cursor: 'pointer'}} 
                         onClick={() => handleSort('rol')}
                       >
-                        💼 Rol {getSortIcon('rol')}
+                        Rol {getSortIcon('rol')}
                       </th>
                       <th 
                         style={{cursor: 'pointer'}} 
                         onClick={() => handleSort('salario')}
                       >
-                        💰 Salario {getSortIcon('salario')}
+                       Salario {getSortIcon('salario')}
                       </th>
                       <th 
                         style={{cursor: 'pointer'}} 
@@ -424,10 +449,11 @@ export default function Empleados() {
                         <td>{val.apellido}</td>
                         <td>{val.edad} años</td>
                         <td>
-                          <span className="badge bg-info text-dark">{val.rol}</span>
-                        </td>
-                        <td><strong>${val.salario?.toLocaleString()}</strong></td>
-                        <td>
+                          <span className="badge bg-info text-dark">
+                            {getNombreRol(val.rol_id)}
+                          </span>
+                        </td> 
+                          <td><strong>{Math.trunc(val.salario)?.toLocaleString()}</strong></td>                        <td>
                           <span className={getEstadoBadge(val.estado)}>
                             {val.estado.charAt(0).toUpperCase() + val.estado.slice(1)}
                           </span>
