@@ -12,8 +12,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-7e1&iq1k9(@xiceb3*=iucu!eh@t@58i!oexurtdxn*16w1g+k'
 
+# Cargar variables del archivo .env
+load_dotenv()
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ["*"]
 
@@ -68,7 +71,6 @@ WSGI_APPLICATION = 'gestor_DISI.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-load_dotenv()
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -101,7 +103,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", 
-    "http://127.0.0.1:5173",
+    "http://localhost",       # tu frontend servido en Nginx (puerto 80)
+    "http://127.0.0.1",       # opcional si accedés con 127.0.0.1
 ]
 
 

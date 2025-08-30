@@ -1,6 +1,6 @@
 import axios from "axios";
-
-const BASE_URL = "http://127.0.0.1:8000/api/departamentos";
+const apiUrl = import.meta.env.VITE_API_URL; // Lee la variable VITE_API_URL
+const BASE_URL = `${apiUrl}/api/departamentos`;
 
 export async function getDepartamentos() {
   try {
