@@ -12,13 +12,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-7e1&iq1k9(@xiceb3*=iucu!eh@t@58i!oexurtdxn*16w1g+k'
 
-# Cargar variables del archivo .env
-load_dotenv()
+# Cargar variables del archivo segun el entornos
+load_dotenv(".env")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -74,11 +74,11 @@ WSGI_APPLICATION = 'gestor_DISI.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('PGSQL_DATABASE'),
-        'USER': os.environ.get('PGSQL_USER'),
-        'PASSWORD': os.environ.get('PGSQL_PASSWORD'),
-        'HOST': os.environ.get('PGSQL_HOST'),
-        'PORT': os.environ.get('PGSQL_PORT'),
+        'NAME': os.getenv('PGSQL_DATABASE'),
+        'USER': os.getenv('PGSQL_USER'),
+        'PASSWORD': os.getenv('PGSQL_PASSWORD'),
+        'HOST': os.getenv('PGSQL_HOST'),
+        'PORT': os.getenv('PGSQL_PORT'),
     }
 }
 
@@ -101,12 +101,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173", 
-    "http://localhost",       # tu frontend servido en Nginx (puerto 80)
-    "http://127.0.0.1",       # opcional si accedés con 127.0.0.1
-]
-
+CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
