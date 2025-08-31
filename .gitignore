@@ -22,6 +22,7 @@ Thumbs.db
 
 # Entornos
 .env
+.env.pro
 
 # ignorar archivos estáticos
 staticfiles/
