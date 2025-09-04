@@ -1,6 +1,8 @@
 import axios from "axios";
-const apiUrl = import.meta.env.VITE_API_URL; // Lee la variable VITE_API_URL
-const BASE_URL = `${apiUrl}/api/empleados`;
+import { API_URL } from "../../config";
+
+const BASE_URL = `${API_URL}/api/empleados`;
+
 export async function getEmpleados() {
     try {
         const response = await axios.get(`${BASE_URL}/list/`);

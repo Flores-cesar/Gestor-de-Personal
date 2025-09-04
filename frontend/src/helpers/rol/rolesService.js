@@ -1,6 +1,7 @@
 import axios from "axios";
-const apiUrl = import.meta.env.VITE_API_URL; // Lee la variable VITE_API_URL
-const BASE_URL = `${apiUrl}/api/roles`;
+import { API_URL } from "../../config";
+
+const BASE_URL = `${API_URL}/api/roles`;
 
 export async function getRoles() {
   try {
