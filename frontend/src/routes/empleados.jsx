@@ -285,7 +285,7 @@ export default function Empleados() {
                       value={rol} 
                       className="form-select" 
                       onChange={(e) => setRol(Number(e.target.value))}
-                      requiered
+                      required
                     >
                       <option value="">Seleccione un rol</option>
                       {roles.map((r) => (
@@ -453,7 +453,8 @@ export default function Empleados() {
                             {getNombreRol(val.rol_id)}
                           </span>
                         </td> 
-                          <td><strong>{Math.trunc(val.salario)?.toLocaleString()}</strong></td>                        <td>
+                        <td><strong>{Math.trunc(val.salario)?.toLocaleString()}</strong></td>
+                        <td>
                           <span className={getEstadoBadge(val.estado)}>
                             {val.estado.charAt(0).toUpperCase() + val.estado.slice(1)}
                           </span>
