@@ -143,7 +143,7 @@ def departamento_create(request):
     if data is None:
         return JsonResponse({"message": "JSON inválido"}, status=400)
 
-    responsable = None
+    responsable_id = None
     if data.get("responsable"):
         try:
             responsable_id = Empleado.objects.get(id_empleado=data["responsable"])
