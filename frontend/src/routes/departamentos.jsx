@@ -149,7 +149,7 @@ export default function Departamentos() {
       setEditar(false);
       limpiarFormulario();
     } catch (error) {
-      console.error("Error al actualizar el departamento", error);    
+      alert(error.message);    
     }
   };
 
