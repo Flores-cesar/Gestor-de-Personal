@@ -8,6 +8,7 @@ export default function Departamentos() {
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [responsableId, setResponsableId] = useState("");
+  const [parentId, setParentId] = useState("");
   const [departamentos, setDepartamentos] = useState([]);
   const [empleados, setEmpleados] = useState([]); // Para mostrar nombre del responsable
   const [editar, setEditar] = useState(false);
@@ -59,6 +60,13 @@ export default function Departamentos() {
     if (!responsableId) return 'Sin responsable';
     const empleado = empleados.find(e => e.id_empleado === responsableId);
     return empleado ? `${empleado.nombre} ${empleado.apellido}` : 'Empleado no encontrado';
+  };
+
+  // Función para obtener el nombre del departamento padre
+  const getNombreDepartamentoPadre = (parentId) => {
+    if (!parentId) return 'Sin departamento padre';
+    const departamento = departamentos.find(d => d.id_departamento === parentId);
+    return departamento ? departamento.nombre : 'Departamento no encontrado';
   };
 
   // Función para obtener departamentos filtrados y ordenados
@@ -113,6 +121,7 @@ export default function Departamentos() {
         nombre,
         descripcion,
         responsable: responsableId ? parseInt(responsableId) : null,
+        parent: parentId ? parseInt(parentId) : null,
       };
       console.log("Datos enviados:", nuevoDepartamento);
       await createDepartamento(nuevoDepartamento);
@@ -131,6 +140,7 @@ export default function Departamentos() {
         nombre,
         descripcion,
         responsable: responsableId ? parseInt(responsableId) : null,
+        parent: parentId ? parseInt(parentId) : null,
       };
       console.log("Datos enviados para actualizar:", departamentoActualizado);
       await updateDepartamento(idDepartamento, departamentoActualizado);
@@ -139,7 +149,7 @@ export default function Departamentos() {
       setEditar(false);
       limpiarFormulario();
     } catch (error) {
-      console.error("Error al actualizar el departamento", error);
+      console.error("Error al actualizar el departamento", error);    
     }
   };
 
@@ -161,12 +171,14 @@ export default function Departamentos() {
     setNombre(val.nombre);
     setDescripcion(val.descripcion || "");
     setResponsableId(val.responsable_id ? val.responsable_id.toString() : "");
+    setParentId(val.parent_id ? val.parent_id.toString() : "");
   };
 
   const limpiarFormulario = () => {
     setNombre("");
     setDescripcion("");
     setResponsableId("");
+    setParentId("");
     setIdDepartamento(null);
     setEditar(false);
   };
@@ -255,6 +267,28 @@ export default function Departamentos() {
                     </div>
                   )}
                 </div>
+
+                <div className="col-12 mb-3">
+                  <label className="form-label fw-bold">🏢 ID Departamento Padre</label>
+                  <input 
+                    type="number" 
+                    value={parentId} 
+                    onChange={(e) => setParentId(e.target.value)} 
+                    className="form-control" 
+                    placeholder="Ingresa el ID del departamento padre"
+                    min="1"
+                  />
+                  <div className="form-text">
+                    💡 Deja vacío si es un departamento principal
+                  </div>
+                  {parentId && (
+                    <div className="mt-2">
+                      <span className="badge bg-info">
+                        Padre: {getNombreDepartamentoPadre(parseInt(parentId))}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </form>
             </div>
             
@@ -262,7 +296,7 @@ export default function Departamentos() {
               {editar ? (
                 <div className="d-grid gap-2">
                   <button className="btn btn-warning" onClick={actualizarDepartamento}>
-                    ✏️ Actualizar Departamento
+                    Actualizar Departamento
                   </button>
                   <button className="btn btn-outline-secondary" onClick={limpiarFormulario}>
                     ❌ Cancelar
@@ -341,6 +375,9 @@ export default function Departamentos() {
                       >
                         Responsable {getSortIcon('responsable_id')}
                       </th>
+                      <th>
+                        Dep. Padre
+                      </th>
                       <th>⚙️ Acciones</th>
                     </tr>
                   </thead>
@@ -367,6 +404,19 @@ export default function Departamentos() {
                             </div>
                           ) : (
                             <span className="badge bg-secondary">Sin responsable</span>
+                          )}
+                        </td>
+                        <td>
+                          {val.parent_id ? (
+                            <div>
+                              <span className="badge bg-primary">
+                                {getNombreDepartamentoPadre(val.parent_id)}
+                              </span>
+                              <br />
+                              <small className="text-muted">ID: {val.parent_id}</small>
+                            </div>
+                          ) : (
+                            <span className="badge bg-secondary">Dep. Principal</span>
                           )}
                         </td>
                         <td>
