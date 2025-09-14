@@ -1,6 +1,6 @@
 services:
   backend:
-    build: ./backend_api_django/gestor_DISI   
+    build: ./backend_api_django/gestor_DISI
     container_name: backend
     ports:
       - "8000:8000"
@@ -26,12 +26,23 @@ services:
   frontend:
     build: ./frontend
     container_name: frontend
-    ports:
-      - "80:80"   
+    expose:
+      - "80"   # solo accesible internamente
     depends_on:
       - backend
 #    environment:
-#      - VITE_API_URL=http://backend:8000 
+#      - API_URL=http://<IP_PUBLICA>:8000 
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_proxy
+    ports:
+      - "80:80"  # el usuario accede solo por este puerto
+    volumes:
+      - ./docker/proxy.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+      - frontend
 
 volumes:
   postgres_data:
