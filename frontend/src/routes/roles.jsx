@@ -8,7 +8,7 @@ export default function Roles() {
   const [responsabilidades, setResponsabilidades] = useState("");
   const [departamentoId, setDepartamentoId] = useState("");
   const [roles, setRoles] = useState([]);
-  const [departamentos, setDepartamentos] = useState([]); // Para el select
+  const [departamentos, setDepartamentos] = useState([]); // Para mostrar nombres de departamentos
   const [editar, setEditar] = useState(false);
   const [idRol, setIdRol] = useState(null);
   
@@ -56,7 +56,7 @@ export default function Roles() {
   // Función para obtener el nombre del departamento
   const getNombreDepartamento = (departamentoId) => {
     const departamento = departamentos.find(d => d.id_departamento === departamentoId);
-    return departamento ? departamento.nombre : 'Sin departamento';
+    return departamento ? departamento.nombre : 'Departamento no encontrado';
   };
 
   // Función para obtener roles filtrados y ordenados
@@ -127,7 +127,7 @@ export default function Roles() {
       const rolActualizado = {
         nombre,
         responsabilidades,
-        departamento_id: parseInt(departamentoId),
+        departamento: parseInt(departamentoId),
       };
       console.log("Datos enviados para actualizar:", rolActualizado);
       await updateRol(idRol, rolActualizado);
@@ -136,7 +136,7 @@ export default function Roles() {
       setEditar(false);
       limpiarFormulario();
     } catch (error) {
-      console.error("Error al actualizar el rol", error);
+      alert(error.message);
     }
   };
 
@@ -195,26 +195,30 @@ export default function Roles() {
           <div className="card shadow-sm h-100">
             <div className="card-header bg-primary text-white">
               <h5 className="mb-0">
-                {editar ? "Editar Rol" : "➕ Nuevo Rol"}
+                {editar ? "✏️ Editar Rol" : "➕ Nuevo Rol"}
               </h5>
             </div>
             <div className="card-body">
               <form>
                 <div className="col-12 mb-3">
-                  <label className="form-label fw-bold">Departamento</label>
-                  <select 
+                  <label className="form-label fw-bold">🏢 ID Departamento</label>
+                  <input 
+                    type="number" 
                     value={departamentoId} 
-                    className="form-select" 
-                    onChange={(e) => setDepartamentoId(e.target.value)}
+                    onChange={(e) => setDepartamentoId(e.target.value)} 
+                    className="form-control" 
+                    placeholder="Ingresa el ID del departamento"
+                    min="1"
                     required
-                  >
-                    <option value="">Seleccionar departamento</option>
-                    {departamentos.map((dept) => (
-                      <option key={dept.id_departamento} value={dept.id_departamento}>
-                        {dept.nombre}
-                      </option>
-                    ))}
-                  </select>
+                  />
+
+                  {departamentoId && (
+                    <div className="mt-2">
+                      <span className="badge bg-info">
+                        Departamento: {getNombreDepartamento(parseInt(departamentoId))}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="col-12 mb-3">
@@ -338,9 +342,13 @@ export default function Roles() {
                         <td><span className="badge bg-light text-dark">{val.id_rol}</span></td>
                         <td><strong>{val.nombre}</strong></td>
                         <td>
-                          <span className="badge bg-info text-dark">
-                            {getNombreDepartamento(val.departamento_id)}
-                          </span>
+                          <div>
+                            <span className="badge bg-info text-dark">
+                              {getNombreDepartamento(val.departamento_id)}
+                            </span>
+                            <br />
+                            <small className="text-muted">ID: {val.departamento_id}</small>
+                          </div>
                         </td>
                         <td>
                           <span className="text-muted" title={val.responsabilidades}>
