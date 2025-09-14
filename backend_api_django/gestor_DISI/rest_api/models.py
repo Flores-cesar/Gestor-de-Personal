@@ -2,6 +2,15 @@ from django.db import models
 
 class Departamento(models.Model):
     id_departamento = models.AutoField(primary_key=True)
+
+    parent = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="subdepartamentos"
+    )
+
     responsable = models.ForeignKey(
         "Empleado",  # entre comillas porque se referencia más abajo
         on_delete=models.SET_NULL,
