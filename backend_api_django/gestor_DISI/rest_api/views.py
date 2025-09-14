@@ -133,6 +133,7 @@ def departamento_detail(request, id_departamento):
         "responsable": d.responsable.id_empleado if d.responsable else None,
         "nombre": d.nombre,
         "descripcion": d.descripcion,
+        "parent": d.parent.id_departamento if d.parent else None,
     }
     return JsonResponse({"message": "success", "departamento": data})
 
@@ -150,8 +151,16 @@ def departamento_create(request):
         except Empleado.DoesNotExist:
             return JsonResponse({"message": "Responsable no encontrado"}, status=400)
 
+    parent_id = None
+    if data.get("parent"):
+        try:
+            parent_id = Departamento.objects.get(id_departamento=data["parent"])
+        except Departamento.DoesNotExist:
+            return JsonResponse({"message": "Departamento padre no encontrado"}, status=400)
+
     d = Departamento.objects.create(
         responsable=responsable_id,
+        parent=parent_id, 
         nombre=data.get("nombre", ""),
         descripcion=data.get("descripcion", "")
     )
@@ -180,6 +189,22 @@ def departamento_update(request, id_departamento):
                 d.responsable = Empleado.objects.get(id_empleado=data["responsable"])
             except Empleado.DoesNotExist:
                 return JsonResponse({"message": "Responsable no encontrado"}, status=400)
+
+    if "parent" in data: 
+
+        if data["parent"] == id_departamento:
+            return JsonResponse(
+                {"message": "Un departamento no puede ser su propio padre"},
+                status=400
+            )
+        
+        if data["parent"] is None:
+            d.parent = None
+        else:
+            try:
+                d.parent = Departamento.objects.get(id_departamento=data["parent"])
+            except Departamento.DoesNotExist:
+                return JsonResponse({"message": "Departamento padre no encontrado"}, status=400)
 
     d.save()
     return JsonResponse({"message": "Departamento actualizado"})
